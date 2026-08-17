@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renamer-X</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Bulk Renaming of files</h1>
+        
+        <form id="renameForm">
+            <label for="directoryPath">Directory Path:</label>
+            <input type="text" id="directoryPath" name="directoryPath" required>
+            <label for="find">Replace this:</label>
+            <input type="text" id="find" name="find" required>
+            <label for="replace">Replace with:</label>
+            <input type="text" id="replace" name="replace" required>
+            <button type="submit">Rename files</button>
+        </form>
+        <div id="output" class="hidden">
+            <h2>Renamed Files:</h2>
+            <ul id="fileList"></ul>
+        </div>
+    </div>
+    <div class="background"></div>
+</body>
+</html>
