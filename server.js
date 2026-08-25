@@ -2,6 +2,8 @@ const express = require("express");
 const fs = require("fs").promises;
 const path = require("path");
 
+const { bulkRename } = require("./services/renameService");
+
 const app = express();
 const port = 3000;
 
@@ -49,23 +51,23 @@ async function validateDirectory(directoryPath) {
 }
 //Input validation function
 function validateRenameInputs(find, replace) {
-    if (typeof find !== "string" || find.trim() === "") {
-        return {
-            valid: false,
-            error: "The 'find' value cannot be empty."
-        };
-    }
-
-    if (replace === undefined) {
-        return {
-            valid: false,
-            error: "The 'replace' value is required."
-        };
-    }
-
+  if (typeof find !== "string" || find.trim() === "") {
     return {
-        valid: true
+      valid: false,
+      error: "The 'find' value cannot be empty.",
     };
+  }
+
+  if (replace === undefined) {
+    return {
+      valid: false,
+      error: "The 'replace' value is required.",
+    };
+  }
+
+  return {
+    valid: true,
+  };
 }
 
 app.post("/rename", async (req, res) => {
@@ -73,15 +75,15 @@ app.post("/rename", async (req, res) => {
     const find = req.query.find;
     const replace = req.query.replace; 
     old logic */
-const { directoryPath, find, replace } = req.body;
+  const { directoryPath, find, replace } = req.body;
 
-   const inputValidation = validateRenameInputs(find, replace);
+  const inputValidation = validateRenameInputs(find, replace);
 
-    if (!inputValidation.valid) {
-        return res.status(400).json({
-            error: inputValidation.error
-        });
-    }
+  if (!inputValidation.valid) {
+    return res.status(400).json({
+      error: inputValidation.error,
+    });
+  }
 
   const directory = await validateDirectory(directoryPath);
 
@@ -92,6 +94,17 @@ const { directoryPath, find, replace } = req.body;
   }
 
   try {
+    const result = await bulkRename(directory.path, find, replace);
+
+    res.json(result);
+  } catch (error) {
+    console.error("Error:", error);
+
+    res.status(500).json({
+      error: "An error occurred while renaming files.",
+    });
+  }
+  /* try {
     const files = await fs.readdir(directoryPath);
     const renamedFiles = [];
 
@@ -112,7 +125,7 @@ const { directoryPath, find, replace } = req.body;
     res.status(500).json({
       error: "An error occurred",
     });
-  }
+  } main rename logic is shifted from here to services>renameService.js */
 });
 
 app.listen(port, () => {

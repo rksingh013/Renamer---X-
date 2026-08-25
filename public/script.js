@@ -12,31 +12,64 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
       const response = await fetch("/rename", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        directoryPath,
-        find,
-        replace
-    })
-});
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          directoryPath,
+          find,
+          replace,
+        }),
+      });
+
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.error || `HTTP error! Status: ${response.status}`);
       }
+
       fileList.innerHTML = "";
-      if (data.length === 0) {
+
+      if (
+        data.renamed.length === 0 &&
+        data.skipped.length === 0 &&
+        data.failed.length === 0
+      ) {
         fileList.innerHTML = "<li>No files renamed.</li>";
       } else {
-        data.forEach((fileName) => {
+        // Successfully renamed
+        data.renamed.forEach((file) => {
           const li = document.createElement("li");
-          li.textContent = fileName;
+
+          li.textContent = `✓ ${file.original} → ${file.target}`;
+
+          fileList.appendChild(li);
+        });
+
+        // Skipped files
+        data.skipped.forEach((file) => {
+          const li = document.createElement("li");
+
+          li.textContent = `⚠ ${file.original} → ${file.target} (${file.reason})`;
+
+          li.classList.add("rename-skipped");
+
+          fileList.appendChild(li);
+        });
+
+        // Failed files
+        data.failed.forEach((file) => {
+          const li = document.createElement("li");
+
+          li.textContent = `✕ ${file.original} → ${file.target} (${file.reason})`;
+
+          li.classList.add("rename-failed");
+
           fileList.appendChild(li);
         });
       }
+
       output.style.display = "block";
     } catch (error) {
       console.error("Error:", error);
