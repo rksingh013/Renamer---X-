@@ -35,25 +35,36 @@ async function bulkRename(directoryPath, find, replace) {
   const failed = [];
 
   for (const entry of entries) {
-    // #9 - Skip directories
+    const file = entry.name;
+
+    // Separate filename from extension
+    const parsedPath = path.parse(file);
+    const fileName = parsedPath.name;
+    const extension = parsedPath.ext;
+
+    // Search only inside the filename, NOT the extension
+    if (!fileName.includes(find)) {
+      continue;
+    }
+
+    // Check file type only for matching entries
     if (!entry.isFile()) {
       skipped.push({
-        original: entry.name,
-        target: entry.name,
-        reason: "Directory or non-file entry. So it's skipped.",
+        original: file,
+        target: file,
+        reason: "Matching entry is not a file.",
       });
 
       continue;
     }
 
-    const file = entry.name;
-    const newName = file.replace(find, replace);
+    // Replace only inside the filename
+    const newFileName = fileName.replace(find, replace);
 
-    if (newName === file) {
-      continue;
-    }
+    // Put the original extension back unchanged
+    const newName = newFileName + extension;
 
-    // #6 - Validate generated filename
+    // Validate generated filename
     const filenameValidation = validateFilename(newName);
 
     if (!filenameValidation.valid) {
@@ -69,7 +80,7 @@ async function bulkRename(directoryPath, find, replace) {
     const oldPath = path.join(directoryPath, file);
     const newPath = path.join(directoryPath, newName);
 
-    // #5 - Check whether destination already exists
+    // Check whether destination already exists
     try {
       await fs.access(newPath);
 
@@ -92,7 +103,7 @@ async function bulkRename(directoryPath, find, replace) {
       }
     }
 
-    // #8 - Handle individual rename failure
+    // Rename matching file
     try {
       await fs.rename(oldPath, newPath);
 

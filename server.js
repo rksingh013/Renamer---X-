@@ -104,7 +104,8 @@ app.post("/rename", async (req, res) => {
       error: "An error occurred while renaming files.",
     });
   }
-  /* try {
+  /* main rename logic is shifted from here to services>renameService.js
+  try {
     const files = await fs.readdir(directoryPath);
     const renamedFiles = [];
 
@@ -125,7 +126,7 @@ app.post("/rename", async (req, res) => {
     res.status(500).json({
       error: "An error occurred",
     });
-  } main rename logic is shifted from here to services>renameService.js */
+  } */
 });
 
 app.listen(port, () => {
