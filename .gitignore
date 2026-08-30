@@ -1,2 +1,4 @@
+roughfile.js
 node_modules/
 .env
+logs/

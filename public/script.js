@@ -29,17 +29,20 @@ document.addEventListener("DOMContentLoaded", function () {
         throw new Error(data.error || `HTTP error! Status: ${response.status}`);
       }
 
+      // Get rename results from standardized API response
+      const result = data.data;
+
       fileList.innerHTML = "";
 
       if (
-        data.renamed.length === 0 &&
-        data.skipped.length === 0 &&
-        data.failed.length === 0
+        result.renamed.length === 0 &&
+        result.skipped.length === 0 &&
+        result.failed.length === 0
       ) {
-        fileList.innerHTML = "<li>No files renamed.</li>";
+        fileList.innerHTML = "<li>No files renamed, Target file does not exists.</li>";
       } else {
         // Successfully renamed
-        data.renamed.forEach((file) => {
+        result.renamed.forEach((file) => {
           const li = document.createElement("li");
 
           li.textContent = `✓ ${file.original} → ${file.target}`;
@@ -48,7 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // Skipped files
-        data.skipped.forEach((file) => {
+        result.skipped.forEach((file) => {
           const li = document.createElement("li");
 
           li.textContent = `⚠ ${file.original} → ${file.target} (${file.reason})`;
@@ -59,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         // Failed files
-        data.failed.forEach((file) => {
+        result.failed.forEach((file) => {
           const li = document.createElement("li");
 
           li.textContent = `✕ ${file.original} → ${file.target} (${file.reason})`;

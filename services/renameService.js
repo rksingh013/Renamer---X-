@@ -1,6 +1,8 @@
 const fs = require("fs").promises;
 const path = require("path");
 
+const logger = require("../utils/logger");
+
 /* filename validation function for generating new name */
 function validateFilename(filename) {
   const invalidCharacters = /[<>:"/\\|?*]/;
@@ -24,7 +26,23 @@ function validateFilename(filename) {
   };
 }
 
-/* core renaming function for all files */
+/* Generate new filename while keeping extension unchanged */
+function generateNewName(file, find, replace) {
+  const parsedPath = path.parse(file);
+
+  const fileName = parsedPath.name;
+  const extension = parsedPath.ext;
+
+  if (fileName !== find) {
+    return null;
+  }
+
+  const newFileName = replace;
+
+  return newFileName + extension;
+}
+
+/* core bulk renaming function */
 async function bulkRename(directoryPath, find, replace) {
   const entries = await fs.readdir(directoryPath, {
     withFileTypes: true,
@@ -37,13 +55,11 @@ async function bulkRename(directoryPath, find, replace) {
   for (const entry of entries) {
     const file = entry.name;
 
-    // Separate filename from extension
-    const parsedPath = path.parse(file);
-    const fileName = parsedPath.name;
-    const extension = parsedPath.ext;
+    // Generate target name
+    const newName = generateNewName(file, find, replace);
 
-    // Search only inside the filename, NOT the extension
-    if (!fileName.includes(find)) {
+    // Ignore entries whose filename does not contain find
+    if (newName === null) {
       continue;
     }
 
@@ -57,12 +73,6 @@ async function bulkRename(directoryPath, find, replace) {
 
       continue;
     }
-
-    // Replace only inside the filename
-    const newFileName = fileName.replace(find, replace);
-
-    // Put the original extension back unchanged
-    const newName = newFileName + extension;
 
     // Validate generated filename
     const filenameValidation = validateFilename(newName);
@@ -112,7 +122,7 @@ async function bulkRename(directoryPath, find, replace) {
         target: newName,
       });
     } catch (error) {
-      console.error(`Failed to rename "${file}":`, error);
+      logger.error(`Failed to rename "${file}": ${error.message}`);
 
       failed.push({
         original: file,
