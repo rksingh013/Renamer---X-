@@ -4,30 +4,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Renamer-X</title>
+
     <link rel="stylesheet" href="styles.css">
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Bulk Renaming of files</h1>
+    <main class="container">
 
-        <form id="renameForm">
-            <label for="directoryPath">Directory Path:</label>
-            <input type="text" id="directoryPath" name="directoryPath" required>
-            <label for="find">Replace this: (Find)</label>
-            <input type="text" id="find" name="find" required>
-            <label for="replace">Replace with:</label>
-            <input type="text" id="replace" name="replace" required>
-            <button type="submit">Execute operation</button>
-        </form>
-        <div id="output" class="hidden">
-            <h2>Renamed Files:</h2>
-            <ul id="fileList"></ul>
-        </div>
-    </div>
-    <div class="background"></div>
+        <section class="app-card">
+
+            <header class="header">
+                <h1>Renamer-X</h1>
+                <p>Simple and reliable bulk file renaming</p>
+            </header>
+
+            <form id="renameForm">
+
+                <div class="form-group">
+                    <label for="directoryPath">Directory Path</label>
+                    <input type="text" id="directoryPath" name="directoryPath"
+                        placeholder="Example: C:\Users\Username\Documents\Files" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="find">Current Filename</label>
+                    <input type="text" id="find" name="find" placeholder="Example: ABC" required>
+                    <small>Enter the exact filename without its extension.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="replace">New Filename</label>
+                    <input type="text" id="replace" name="replace" placeholder="Example: NEW" required>
+                    <small>The original file extension will remain unchanged.</small>
+                </div>
+
+                <button type="submit">
+                    Rename Files
+                </button>
+
+            </form>
+
+            <section id="output" class="results" aria-live="polite">
+
+                <h2>Operation Results</h2>
+
+                <ul id="fileList"></ul>
+
+            </section>
+
+        </section>
+
+    </main>
 </body>
 
 </html>

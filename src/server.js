@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const fs = require("fs").promises;
 const path = require("path");
@@ -6,16 +8,15 @@ const { bulkRename } = require("./services/renameService");
 const logger = require("./utils/logger");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.use(express.static("public"));
+app.use(express.static(path.join(__dirname, "..", "public")));
 app.use(express.json());
 
-//Directory path validation function
+// Directory path validation function
 async function validateDirectory(directoryPath) {
   try {
     const resolvedPath = path.resolve(directoryPath);
-
     const stats = await fs.stat(resolvedPath);
 
     if (!stats.isDirectory()) {
@@ -54,8 +55,16 @@ async function validateDirectory(directoryPath) {
     };
   }
 }
-//Input validation function
-function validateRenameInputs(find, replace) {
+
+// Input validation function
+function validateRenameInputs(directoryPath, find, replace) {
+  if (typeof directoryPath !== "string" || directoryPath.trim() === "") {
+    return {
+      valid: false,
+      error: "The 'directoryPath' value cannot be empty.",
+    };
+  }
+
   if (typeof find !== "string" || find.trim() === "") {
     return {
       valid: false,
@@ -63,10 +72,10 @@ function validateRenameInputs(find, replace) {
     };
   }
 
-  if (replace === undefined) {
+  if (typeof replace !== "string") {
     return {
       valid: false,
-      error: "The 'replace' value is required.",
+      error: "The 'replace' value must be a string.",
     };
   }
 
@@ -78,7 +87,7 @@ function validateRenameInputs(find, replace) {
 app.post("/rename", async (req, res) => {
   const { directoryPath, find, replace } = req.body;
 
-  const inputValidation = validateRenameInputs(find, replace);
+  const inputValidation = validateRenameInputs(directoryPath, find, replace);
 
   if (!inputValidation.valid) {
     return res.status(400).json({
@@ -99,18 +108,23 @@ app.post("/rename", async (req, res) => {
   try {
     const result = await bulkRename(directory.path, find, replace);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: result,
     });
   } catch (error) {
     logger.error(`Rename operation failed: ${error.message}`);
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       error: "An error occurred while renaming files.",
     });
   }
+});
+
+// Handle unknown routes
+app.use((req, res) => {
+  return res.status(404).sendFile(path.join(__dirname, "..", "public", "404.html"));
 });
 
 app.listen(port, () => {

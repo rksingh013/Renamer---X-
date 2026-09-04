@@ -67,7 +67,7 @@ async function bulkRename(directoryPath, find, replace) {
       skipped.push({
         original: file,
         target: file,
-        reason: "Entered value is not a file.",
+        reason: "Matching entry is not a file.",
       });
 
       continue;

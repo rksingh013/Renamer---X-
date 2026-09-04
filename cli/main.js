@@ -60,4 +60,4 @@ async function bulkRename(directoryPath, find, replace) {
 // 1 - path of folder
 // 2 - Rename this
 // 3 - Rename to
-bulkRename("C:\\Users\\offic\\Desktop\\Demo Files", "ravi", "RK");
+bulkRename("C:\Users\offic\Desktop\New folder", "rt", "RK");

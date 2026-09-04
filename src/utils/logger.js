@@ -7,11 +7,11 @@ const logger = winston.createLogger({
     winston.format.timestamp(),
     winston.format.printf(({ timestamp, level, message }) => {
       return `${timestamp} [${level.toUpperCase()}]: ${message}`;
-    })
+    }),
   ),
 
   transports: [
-    // General logs
+    // Error logs
     new winston.transports.File({
       filename: "logs/error.log",
       level: "error",
@@ -22,7 +22,7 @@ const logger = winston.createLogger({
       filename: "logs/combined.log",
     }),
 
-    // Show logs in terminal
+    // Terminal logs
     new winston.transports.Console(),
   ],
 });

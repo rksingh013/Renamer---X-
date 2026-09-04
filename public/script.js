@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Get rename results from standardized API response
       const result = data.data;
-
+      const summary = result.summary;
       fileList.innerHTML = "";
 
       if (
@@ -39,7 +39,8 @@ document.addEventListener("DOMContentLoaded", function () {
         result.skipped.length === 0 &&
         result.failed.length === 0
       ) {
-        fileList.innerHTML = "<li>No files renamed, Target file does not exists.</li>";
+        fileList.innerHTML =
+          "<li>No files renamed, Target file does not exists.</li>";
       } else {
         // Successfully renamed
         result.renamed.forEach((file) => {
@@ -72,6 +73,19 @@ document.addEventListener("DOMContentLoaded", function () {
           fileList.appendChild(li);
         });
       }
+
+      // Display operation summary
+      const summaryItem = document.createElement("li");
+
+      summaryItem.textContent =
+        `Summary: ${summary.renamed} renamed, ` +
+        `${summary.skipped} skipped, ` +
+        `${summary.failed} failed ` +
+        `(Total: ${summary.total})`;
+
+      summaryItem.classList.add("rename-summary");
+
+      fileList.appendChild(summaryItem);
 
       output.style.display = "block";
     } catch (error) {
